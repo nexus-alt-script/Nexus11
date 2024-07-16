@@ -22,12 +22,12 @@ async function loadFiles() {
 async function initializeApi() {
   try {
     const appState = JSON.parse(await fs.readFile('appstate.json', 'utf8'));
-    login({ appState }, (err, api) => {
+    login({ appState }, (err, fbApi) => {
       if (err) {
         console.error(err);
         process.exit(1); // Exit if login fails
       }
-      api = api;
+      api = fbApi;
       api.listenMqtt((err, event) => {
         if (err) {
           console.error(err);
@@ -35,10 +35,14 @@ async function initializeApi() {
         }
         if (event.isGroup) {
           if (event.body === "/getID") {
-            api.sendMessage("Hello User!,\nYour ID is: " + event.senderID)
+            api.sendMessage("Hello User!,\nYour ID is: " + event.senderID, (err) => {
+              if (err) console.error(err);
+            });
           }
         } else {
-          api.sendMessage("Hello User!,\nThis bot is only made for groups.", event.threadID)
+          api.sendMessage("Hello User!,\nThis bot is only made for groups.", event.threadID, (err) => {
+            if (err) console.error(err);
+          });
         }
       });
     });
@@ -69,18 +73,22 @@ app.get('/verify', async (req, res) => {
     uid: id
   };
 
-  try {
-    await api.sendMessage(messageBody, id);
+  api.sendMessage(messageBody, id, (err) => {
+    if (err) {
+      console.error("Error sending verification message:", err);
+      return res.status(500).send("An error occurred during verification.");
+    }
     database.push(body);
-    await fs.writeFile("./db/db/db.json", JSON.stringify(database));
-    res.send("Verification message sent successfully.");
-  } catch (err) {
-    console.error("Error during verification:", err);
-    res.status(500).send("An error occurred during verification.");
-  }
+    fs.writeFile("./db/db/db.json", JSON.stringify(database))
+      .then(() => res.send("Verification message sent successfully."))
+      .catch((err) => {
+        console.error("Error writing to database:", err);
+        res.status(500).send("An error occurred during verification.");
+      });
+  });
 });
 
-app.get('/worldchat', async (req, res) => {
+app.get('/worldchat', (req, res) => {
   const show = req.query.show === "true";
   if (show) {
     res.send(worldchat);
@@ -92,14 +100,13 @@ app.get('/worldchat', async (req, res) => {
       name: name,
       message: message
     };
-    try {
-      worldchat.push(body);
-      await fs.writeFile('./worldchat.json', JSON.stringify(worldchat));
-      res.send("Message posted to worldchat.");
-    } catch (err) {
-      console.error("Error posting to worldchat:", err);
-      res.status(500).send("An error occurred while posting to worldchat.");
-    }
+    worldchat.push(body);
+    fs.writeFile('./worldchat.json', JSON.stringify(worldchat))
+      .then(() => res.send("Message posted to worldchat."))
+      .catch((err) => {
+        console.error("Error writing to worldchat file:", err);
+        res.status(500).send("An error occurred while posting to worldchat.");
+      });
   }
 });
 
