@@ -113,7 +113,7 @@ app.get('/worldchat', (req, res) => {
 });
 app.get('/scriptWorld', (req, res) => {
   try {
-    res.sendFile('./worldchat.lua');
+    res.sendFile(__dirname + '/worldchat.lua');
   } catch (err) {
     console.error("Error sending Lua file:", err);
     res.status(500).send("An error occurred while sending the Lua file.");
