@@ -112,7 +112,8 @@ app.get('/worldchat', (req, res) => {
   }
 });
 app.get("/scriptWorld", (req,res) => {
-  res.sendFile('./worldchat.lua')
+  const hh = fs.readFileSync('./worldchat.lua', 'utf8')
+  res.send(hh)
 })
 // Start the server only after loading files and initializing the API
 (async () => {
