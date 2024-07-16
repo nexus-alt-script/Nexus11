@@ -40,7 +40,7 @@ async function initializeApi() {
             });
           }
         } else {
-          api.sendMessage("Hello User!,\nThis bot is only made for groups.", event.threadID, (err) => {
+          api.sendMessage("Hello User!,\nThis bot is only made for groups.", event.messageID, (err) => {
             if (err) console.error(err);
           });
         }
@@ -87,7 +87,9 @@ app.get('/verify', async (req, res) => {
       });
   });
 });
-
+app.get('/', (req, res) => {
+  res.send("Nexus powered by: Hexa")
+})
 app.get('/worldchat', (req, res) => {
   const show = req.query.show === "true";
   if (show) {
