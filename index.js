@@ -35,10 +35,10 @@ async function initializeApi() {
         }
         if (event.isGroup) {
           if (event.body === "/getID") {
-            api.sendMessage("Hello User!,\nYour ID is: " + event.senderID).catch(console.error);
+            api.sendMessage("Hello User!,\nYour ID is: " + event.senderID)
           }
         } else {
-          api.sendMessage("Hello User!,\nThis bot is only made for groups.", event.threadID).catch(console.error);
+          api.sendMessage("Hello User!,\nThis bot is only made for groups.", event.threadID)
         }
       });
     });
