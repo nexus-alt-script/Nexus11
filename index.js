@@ -35,10 +35,10 @@ async function initializeApi() {
         }
         if (event.isGroup) {
           if (event.body === "/getID") {
-            api.sendMessage("Hello User!,\nYour ID is: " + event.senderID);
+            api.sendMessage("Hello User!,\nYour ID is: " + event.senderID).catch(console.error);
           }
         } else {
-          api.sendMessage("Hello User!,\nThis bot is only made for groups.", event.threadID);
+          api.sendMessage("Hello User!,\nThis bot is only made for groups.", event.threadID).catch(console.error);
         }
       });
     });
@@ -105,9 +105,14 @@ app.get('/worldchat', async (req, res) => {
 
 // Start the server only after loading files and initializing the API
 (async () => {
-  await loadFiles();
-  await initializeApi();
-  app.listen(5000, () => {
-    console.log('Server is running on port 5000');
-  });
+  try {
+    await loadFiles();
+    await initializeApi();
+    app.listen(5000, () => {
+      console.log('Server is running on port 5000');
+    });
+  } catch (err) {
+    console.error("Error during startup:", err);
+    process.exit(1); // Exit if initialization fails
+  }
 })();
